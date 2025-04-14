@@ -6,13 +6,10 @@ from cryptography.fernet import Fernet
 from datetime import datetime
 from uuid import uuid4
 
-# ----- Page Configuration -----
 st.set_page_config(page_title="Securely", page_icon="🔐", layout="wide")
 
-# ----- Constants -----
 DATA_FILE = "vault_data.json"
 
-# ----- Styling -----
 st.markdown("""
 <style>
     .alert {
@@ -28,7 +25,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ----- Encryption Setup -----
 try:
     with open("secret.key", "rb") as key_file:
         KEY = key_file.read()
@@ -37,7 +33,6 @@ except FileNotFoundError:
     st.error("🔐 Encryption key not found. Run generate_key.py first.")
     st.stop()
 
-# ----- Load Stored Data -----
 if os.path.exists(DATA_FILE):
     with open(DATA_FILE, "r") as f:
         stored_data = json.load(f)
@@ -54,7 +49,6 @@ if "activity_log" not in st.session_state:
 if "current_page" not in st.session_state:
     st.session_state.current_page = "Home"
 
-# ----- Helper Functions -----
 def hash_passkey(passkey):
     return hashlib.sha256(passkey.encode()).hexdigest()
 
@@ -91,7 +85,6 @@ def save_data():
     with open(DATA_FILE, "w") as f:
         json.dump(stored_data, f)
 
-# ----- Sidebar Navigation -----
 with st.sidebar:
     st.title("🔐 Securely")
     st.markdown("## Navigation")
@@ -104,11 +97,9 @@ with st.sidebar:
     st.markdown(f"Status: {'🔴 Locked' if st.session_state.reauth_required else '🟢 Active'}")
     st.markdown(f"Attempts: {st.session_state.failed_attempts}/3")
 
-# ----- Page Logic -----
 choice = st.session_state.current_page
 st.title("🛡️Securely")
 
-# ------------------ HOME ------------------
 if choice == "🏠 Home":
     st.header("Welcome!")
     st.markdown("- Encrypt & store sensitive data securely.")
@@ -121,7 +112,6 @@ if choice == "🏠 Home":
     else:
         st.markdown("*No activity yet.*")
 
-# ------------------ STORE DATA ------------------
 elif choice == "🔒 Store Data":
     st.header("Store Encrypted Data")
     data = st.text_area("Enter data to encrypt:")
@@ -148,7 +138,6 @@ elif choice == "🔒 Store Data":
             show_alert("✅ Data stored successfully!", "success")
             st.code(f"Data ID: {data_id}", language="text")
 
-# ------------------ RETRIEVE DATA ------------------
 elif choice == "🔑 Retrieve Data":
     if st.session_state.failed_attempts >= 3 or st.session_state.reauth_required:
         st.session_state.reauth_required = True
@@ -173,7 +162,6 @@ elif choice == "🔑 Retrieve Data":
                         st.session_state.reauth_required = True
                         st.rerun()
 
-# ------------------ AUTHORIZATION ------------------
 elif choice == "👤 Authorization":
     st.header("Reauthorize Access")
     password = st.text_input("Enter master password:", type="password")
